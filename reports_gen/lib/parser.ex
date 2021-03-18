@@ -1,7 +1,11 @@
 defmodule ReportsGen.Parser do
+  def build(filename) do
+    File.stream!("reports/#{filename}")
+    |> Stream.map(fn line -> parse_line(line) end)
+  end
+
   def parse_line(line) do
-    line
-    |> String.trim()
+    String.trim(line)
     |> String.split(",")
     |> line_update(4)
   end

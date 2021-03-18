@@ -15,24 +15,47 @@ defmodule ReportsGen do
   ]
 
   @available_month [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
   ]
 
   @available_years [
-    2016, 
-    2017, 
-    2018, 
-    2019, 
+    2016,
+    2017,
+    2018,
+    2019,
     2020
   ]
 
-  def readfile(file_name) do
-    File.stream!("reports/#{file_name}")
+  def build do
+    Parser.build("gen_report.csv")
     # |> Enum.map(fn line -> Parser.parse_line(line) end)
-    |> Enum.reduce(map_users(), fn line, acc ->
-      [user, hr, _dia, _mes, _ano] = Parser.parse_line(line)
-      Map.put(acc, user, hr + acc[user])
-    end)
+    |> Enum.reduce(map_users(), fn line, acc -> calc_values(line, acc) end)
+  end
+
+  def fetch_higher(acc) do
+    Enum.max_by(acc, fn {_key, value} -> value end)
+  end
+
+  def calc_values(
+        [user_name, _hr_rate, _day_rate, mes_rate, ano_rate],
+        %{"users" => users, "month" => month, "years" => years} = acc
+      ) do
+    users = Map.put(users, user_name, users[user_name] + 1)
+    years = Map.put(years, ano_rate, years[ano_rate] + 1 )
+    month = Map.put(month, mes_rate, month[mes_rate] + 1 )
+
+    %{acc | "users" => users, "month" => month, "years" => years}
   end
 
   def map_users do
@@ -46,5 +69,4 @@ defmodule ReportsGen do
       "years" => years
     }
   end
-
 end
