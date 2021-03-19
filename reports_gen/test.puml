@@ -1,0 +1,10 @@
+export TKN=$(curl -X POST 'https://auth.v2dev.opengalaxy.io/auth/realms/master/protocol/openid-connect/token' \
+ -H "Content-Type: application/x-www-form-urlencoded" \
+ -d "username=admin" \
+ -d 'password=9S4GN5LZCfZoXg==' \
+ -d 'grant_type=password' \
+ -d 'client_id=admin-cli' | jq -r '.access_token')
+
+curl -X GET 'https://auth.v2dev.opengalaxy.io/auth/admin/realms' \
+-H "Accept: application/json" \
+-H "Authorization: Bearer $TKN" | jq .

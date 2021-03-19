@@ -1,0 +1,59 @@
+    @startuml
+    
+    skinparam NoteFontName  Courier
+   
+    note as N1
+      dc=opengalaxy,dc=local                             
+      |_ -ou=companies 
+        |_ +ou={company-slug:004}                         
+        |_ +ou={company-slug:003}                         
+        |_ +ou={company-slug:002}                         
+        |_ -ou={company-slug:001} <color:green>[Unidade organizacional da company]
+          |_                         
+          |_ -ou=native-users <color:green>[Unidade organizacional de usuario nativos da company] 
+            |_ -cn=maicon.siqueira@semantix.com.br <color:green>[ Usuario ]
+              |_-MemberOf:[profile:{companny-slug:001}:"engineer"] <color:green>[Membro nativo profile engineer]
+              |_-MemberOf:[profile:{companny-slug:002}:"develop"] <color:green>[Membro convidado do profile develop na company estrangeira]
+              |_
+          |_ -ou=profiles <color:green>[Unidade organizacional de profiles]
+            |_ -cn={companny-slug:001}:engineer
+              |_-MemberOf:[role:{companny-slug:001}:"jupyter,metabase,nifi,trino"]
+              |_
+            |_ -cn={companny-slug:001}:scientist <color:green>[Grupo de usuario: Tipo profile]
+              |_-MemberOf:[role:{companny-slug:001}:"jupyter,metabase,trino"] <color:green>[Grupos de usuario: Tipo role]
+              |_
+            |_ -cn={companny-slug:001}:develop
+              |_-MemberOf:[role:{companny-slug:001}:"jupyter"]
+              |_
+            |_ -cn={companny-slug:001}:dba
+              |_ -MemberOf:[role:{companny-slug:001}:"trino"]
+              |_
+          |_ -ou=role <color:green>[Unidade organizacional de roles]
+            |_ -ou=jupyter <color:green>[Unidade organizacional de resources]
+              |_ -cn=role:{companny-slug:001}:jupyter:access <color:green>[Grupo para atribuicao de roles]
+              |_ -cn=role:{companny-slug:001}:jupyter:admin
+              |_ -cn=role:{companny-slug:001}:jupyter:readonly
+              |_
+            |_ -ou=metabase
+              |_ -cn=role:{companny-slug:001}:metabase:access
+              |_ -cn=role:{companny-slug:001}:metabase:admin
+              |_ -cn=role:{companny-slug:001}:metabase:readonly
+              |_
+            |_ -ou=nifi 
+              |_ -cn=role:{companny-slug:001}:nifi:access
+              |_ -cn=role:{companny-slug:001}:nifi:creator
+              |_ -cn=role:{companny-slug:001}:nifi:executor
+              |_ -cn=role:{companny-slug:001}:nifi:admin
+              |_ -cn=role:{companny-slug:001}:nifi:readonly
+              |_
+            |_ -ou=trino
+              |_ -cn=role:{companny-slug:001}:nifi:access
+              |_ -cn=role:{companny-slug:001}:nifi:dba
+              |_ -cn=role:{companny-slug:001}:trino:dbd
+              |_ -cn=role:{companny-slug:001}:nifi:admin
+              |_ -cn=role:{companny-slug:001}:nifi:readonly
+
+    end note
+    @enduml
+
+    
