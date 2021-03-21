@@ -15,18 +15,18 @@ defmodule ReportsGen do
   ]
 
   @available_month [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    11,
-    12
+    "Janeiro",
+    "Fevereiro",
+    "Março",
+    "Abril",
+    "Maio",
+    "Junho",
+    "Julho",
+    "Agosto",
+    "Setembro",
+    "Outubro",
+    "Novembro",
+    "Dezembro"
   ]
 
   @available_years [
@@ -37,13 +37,13 @@ defmodule ReportsGen do
     2020
   ]
 
-  def build do
-    Parser.build("gen_report.csv")
+  def build(filename) do
+    Parser.build(filename)
     # |> Enum.map(fn line -> Parser.parse_line(line) end)
     |> Enum.reduce(map_users(), fn line, acc -> calc_values(line, acc) end)
   end
 
-  def calc_values(
+  defp calc_values(
         [name, worked_hours, _day, month, year],
         %{
           "all_hours" => all_hours,
@@ -65,7 +65,7 @@ defmodule ReportsGen do
     }
   end
 
-  def map_users do
+  defp map_users do
     hours_per_month = Enum.into(@available_month, %{}, fn x -> {x, 0} end)
     hours_per_year = Enum.into(@available_years, %{}, fn x -> {x, 0} end)
 
@@ -75,12 +75,12 @@ defmodule ReportsGen do
       "hours_per_year" => hours_per_year
     }
 
-    |> Map.put("all_hours", build_report(0))
-    |> Map.put("hours_per_month", build_report(hours_per_month))
-    |> Map.put("hours_per_year", build_report(hours_per_year))
+    |> Map.put("all_hours", map_builder(0))
+    |> Map.put("hours_per_month", map_builder(hours_per_month))
+    |> Map.put("hours_per_year", map_builder(hours_per_year))
   end
 
-  def build_report(value) do
+  defp map_builder(value) do
     Enum.into(@available_users, %{}, fn x -> {x, value} end)
   end
 
