@@ -43,30 +43,45 @@ defmodule ReportsGen do
     |> Enum.reduce(map_users(), fn line, acc -> calc_values(line, acc) end)
   end
 
-  def fetch_higher(acc) do
-    Enum.max_by(acc, fn {_key, value} -> value end)
-  end
-
   def calc_values(
-        [user_name, _hr_rate, _day_rate, mes_rate, ano_rate],
-        %{"users" => users, "month" => month, "years" => years} = acc
+        [name, worked_hours, _day, month, year],
+        %{
+          "all_hours" => all_hours,
+          "hours_per_month" => hours_per_month,
+          "hours_per_year" => hours_per_year
+        }
       ) do
-    users = Map.put(users, user_name, users[user_name] + 1)
-    years = Map.put(years, ano_rate, years[ano_rate] + 1 )
-    month = Map.put(month, mes_rate, month[mes_rate] + 1 )
+    all_hours = Map.put(all_hours, name, all_hours[name] + worked_hours)
+    hours_per_month = Map.put(hours_per_month, name, 
+      Map.put(hours_per_month[name],month, hours_per_month[name][month] + worked_hours))
 
-    %{acc | "users" => users, "month" => month, "years" => years}
+    hours_per_year = Map.put(hours_per_year, name, 
+      Map.put(hours_per_year[name],year, hours_per_year[name][year] + worked_hours))
+
+    %{
+      "all_hours" => all_hours,
+      "hours_per_month" => hours_per_month,
+      "hours_per_year" => hours_per_year
+    }
   end
 
   def map_users do
-    users = Enum.into(@available_users, %{}, fn x -> {x, 0} end)
-    month = Enum.into(@available_month, %{}, fn x -> {x, 0} end)
-    years = Enum.into(@available_years, %{}, fn x -> {x, 0} end)
+    hours_per_month = Enum.into(@available_month, %{}, fn x -> {x, 0} end)
+    hours_per_year = Enum.into(@available_years, %{}, fn x -> {x, 0} end)
 
     %{
-      "users" => users,
-      "month" => month,
-      "years" => years
+      "all_hours" => %{},
+      "hours_per_month" => hours_per_month,
+      "hours_per_year" => hours_per_year
     }
+
+    |> Map.put("all_hours", build_report(0))
+    |> Map.put("hours_per_month", build_report(hours_per_month))
+    |> Map.put("hours_per_year", build_report(hours_per_year))
   end
+
+  def build_report(value) do
+    Enum.into(@available_users, %{}, fn x -> {x, value} end)
+  end
+
 end
