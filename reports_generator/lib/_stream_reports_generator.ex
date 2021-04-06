@@ -16,13 +16,36 @@ defmodule ReportsGeneratorStream do
     "foods",
     "users"
   ]
-  
+
   def build(filename) do
     filename
     |> Parser.parser()
     |> Enum.reduce(map_acc(), fn line, report ->
     sum_values(line,report)
     end)
+  end
+
+  def build_many(filenames) when  not is_list(filenames) do
+    {:error, "it is not a list"}
+  end
+
+  def build_many(filenames) do
+    filenames
+    |> Task.async_stream(fn filename -> build(filename) end)
+    |> Enum.reduce(map_acc(), fn {:ok, result}, report -> sum_reports(report, result) end)
+  end
+
+  defp sum_reports(
+    %{"foods" => foods1, "users" => users1}, %{"foods" => foods2, "users" => users2}
+  ) do
+    foods = map_merge(foods1, foods2)
+    users = map_merge(users1, users2)
+
+    %{"foods" => foods, "users" => users}
+  end
+
+  defp map_merge(map1, map2) do
+    Map.merge(map1, map2, fn _key, value1, value2 -> value1 + value2 end)
   end
 
   defp sum_values([id, food, price], %{"users" => users, "foods" => foods} = report) do

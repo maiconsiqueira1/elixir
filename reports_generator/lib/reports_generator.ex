@@ -16,13 +16,13 @@ defmodule ReportsGenerator do
     "foods",
     "users"
   ]
-  
+
   def build(filename) do
     filename
     |> Parser.parser
     |> Enum.reduce(map_acc(), fn line, report ->
     sum_values(line,report)
-    end
+    end)
   end
 
   defp sum_values([id, food, price], %{"users" => users, "foods" => foods} = report) do
